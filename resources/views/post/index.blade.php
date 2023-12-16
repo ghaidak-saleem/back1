@@ -1,32 +1,26 @@
 @extends('layout')
 @section('content')
 
-{{-- <table style="border: 2px">
-    <th>id</th>
-    <th>title</th>
-    <th>description</th>
-    @foreach ($data as $item)
-    <tr>
-        <td>{{ $item->id }}</td>
-        <td>{{ $item->title }}</td>
-        <td>{{$item->description}}</td>
-    </tr>
-    @endforeach
 
-</table> --}}
-
-
-    @php
-        $array=[236,45,66,67,33,34,99]
-    @endphp
-    <h3>print array elements if item value %2=0 else add 1 to value then print the new value</h3>
-    @foreach ($array as $value)
-        @if($value%2==0)
-            <h2 style="color: green">{{$value}}</h2>
-        @else
-            <h4 style="color: red">{{$value}}&nbsp.........>&nbsp{{$value+1}}</h4>
+    @forelse ($data as $post)
+    <div class="card" style="width: 18rem;">
+        @if($post->image)
+        <img src="{{asset('images/'.$post->image)}}" class="card-img-top" alt="no image for this post">
         @endif
-    @endforeach
-
-
+        <div class="card-body">
+          <h5 class="card-title"> {{ $post->title }}</h5>
+          <p class="card-text"> {{$post->description}}</p>
+          <a href="{{route('post.edit',$post->id)}}" class="btn btn-primary">Edit</a>
+          <a href="{{route('post.show',$post->id)}}" class="btn btn-warning">Show</a>
+          <form action="{{route('post.delete',$post->id)}}" method="POST" style="display: inline">
+            @csrf
+          @method('DELETE')
+          <input type="submit" value="Delete" class="btn btn-danger"
+           onclick="return confirm('Are you sure you want to delete this post?')">
+        </form>
+        </div>
+      </div>
+      @empty
+        <h2>no posts</h2>
+  @endforelse
 @endsection

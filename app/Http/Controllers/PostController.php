@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
-
 class PostController extends Controller
 {
     /**
@@ -14,7 +13,7 @@ class PostController extends Controller
     {
         $data = Post::all();
         return view('post.index', ['data' => $data]);
-       
+
     }
 
     /**
@@ -22,7 +21,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('post.create');
     }
 
     /**
@@ -30,7 +29,23 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+         $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'image'=>'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+        ]);
+        $post =new Post();
+        $post->title =$request->input('title');
+        $post->description =$request->input('description');
+        if($request->hasFile('image')){
+            $image=$request->file('image');
+            $imageName=time().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('images/'),$imageName);
+            $post->image=$imageName;
+        }
+        $post->save();
+        return redirect()->route('post.index')->with('success', 'Data saved successfully');
     }
 
     /**
@@ -38,7 +53,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-
+        
+        return view('post.show', compact('post'));
     }
 
 
@@ -47,7 +63,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return view('post.edit', compact('post'));
     }
 
     /**
@@ -55,14 +71,33 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'image'=>'image|mimes:jpeg,png,jpg,gif|max:2048',
+
+        ]);
+        $post->title =$request->input('title');
+        $post->description =$request->input('description');
+        if($request->hasFile('image')){
+            $image=$request->file('image');
+            $imageName=time(). '.' .$image->getClientOriginalExtension();
+            $image->move(public_path('images/'),$imageName);
+            $post->image=$imageName;
+        }
+        $post->save();
+        return redirect()->route('post.index')->with('success', 'Data saved successfully');
+
+
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Post $post)
     {
-        //
+      $post->delete();
+      return redirect()->route('post.index');
     }
 }
